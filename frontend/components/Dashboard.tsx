@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { formatUnits } from "viem";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  formatUnits,
+} from "viem";
+
 import {
   useAccount,
   useReadContract,
@@ -15,22 +23,34 @@ import {
 
 type Address = `0x${string}`;
 
-type PactRole = "Client" | "Freelancer";
+type PactRole =
+  | "Client"
+  | "Freelancer";
 
-function shortenAddress(address?: string) {
+function shortenAddress(
+  address?: string
+) {
   if (!address) return "—";
 
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  return `${address.slice(
+    0,
+    6
+  )}...${address.slice(-4)}`;
 }
 
-function getStatusLabel(status?: number) {
+function getStatusLabel(
+  status?: number
+) {
   switch (status) {
     case 0:
       return "Active";
+
     case 1:
       return "Completed";
+
     case 2:
       return "Cancelled";
+
     default:
       return "Unknown";
   }
@@ -41,20 +61,27 @@ function StatusBadge({
 }: {
   status: string;
 }) {
-  const styles: Record<string, string> = {
+  const styles: Record<
+    string,
+    string
+  > = {
     Active:
       "border-[#c7ff1a]/20 bg-[#c7ff1a]/10 text-[#c7ff1a]",
+
     Completed:
       "border-[#43d17b]/20 bg-[#43d17b]/10 text-[#43d17b]",
+
     Cancelled:
       "border-[#ff5c5c]/20 bg-[#ff5c5c]/10 text-[#ff7c7c]",
+
     Unknown:
       "border-[#636b74]/20 bg-[#636b74]/10 text-[#8e969f]",
   };
 
   return (
     <span
-      className={`rounded-full border px-2.5 py-1 text-xs font-medium ${styles[status] ?? styles.Unknown
+      className={`rounded-full border px-2.5 py-1 text-xs font-medium ${styles[status] ??
+        styles.Unknown
         }`}
     >
       {status}
@@ -73,46 +100,72 @@ function PactRow({
     data: projectTitle,
     isLoading: titleLoading,
   } = useReadContract({
-    address: pactAddress,
-    abi: pactEscrowAbi,
-    functionName: "projectTitle",
+    address:
+      pactAddress,
+
+    abi:
+      pactEscrowAbi,
+
+    functionName:
+      "projectTitle",
   });
 
   const {
     data: client,
   } = useReadContract({
-    address: pactAddress,
-    abi: pactEscrowAbi,
-    functionName: "client",
+    address:
+      pactAddress,
+
+    abi:
+      pactEscrowAbi,
+
+    functionName:
+      "client",
   });
 
   const {
     data: freelancer,
   } = useReadContract({
-    address: pactAddress,
-    abi: pactEscrowAbi,
-    functionName: "freelancer",
+    address:
+      pactAddress,
+
+    abi:
+      pactEscrowAbi,
+
+    functionName:
+      "freelancer",
   });
 
   const {
     data: totalAmount,
   } = useReadContract({
-    address: pactAddress,
-    abi: pactEscrowAbi,
-    functionName: "totalAmount",
+    address:
+      pactAddress,
+
+    abi:
+      pactEscrowAbi,
+
+    functionName:
+      "totalAmount",
   });
 
   const {
     data: pactStatus,
   } = useReadContract({
-    address: pactAddress,
-    abi: pactEscrowAbi,
-    functionName: "pactStatus",
+    address:
+      pactAddress,
+
+    abi:
+      pactEscrowAbi,
+
+    functionName:
+      "pactStatus",
   });
 
   const role: PactRole =
     connectedAddress &&
-      client?.toLowerCase() === connectedAddress.toLowerCase()
+      client?.toLowerCase() ===
+      connectedAddress.toLowerCase()
       ? "Client"
       : "Freelancer";
 
@@ -121,15 +174,25 @@ function PactRow({
       ? freelancer
       : client;
 
-  const status = getStatusLabel(
-    pactStatus !== undefined
-      ? Number(pactStatus)
-      : undefined
-  );
+  const status =
+    getStatusLabel(
+      pactStatus !==
+        undefined
+        ? Number(
+          pactStatus
+        )
+        : undefined
+    );
 
   const formattedAmount =
-    totalAmount !== undefined
-      ? Number(formatUnits(totalAmount, 6)).toLocaleString()
+    totalAmount !==
+      undefined
+      ? Number(
+        formatUnits(
+          totalAmount,
+          6
+        )
+      ).toLocaleString()
       : "0";
 
   return (
@@ -141,11 +204,14 @@ function PactRow({
         <p className="text-sm font-medium text-white">
           {titleLoading
             ? "Loading..."
-            : projectTitle || "Untitled Pact"}
+            : projectTitle ||
+            "Untitled Pact"}
         </p>
 
         <p className="mt-1 font-mono text-[11px] text-[#636b74]">
-          {shortenAddress(pactAddress)}
+          {shortenAddress(
+            pactAddress
+          )}
         </p>
       </div>
 
@@ -154,7 +220,9 @@ function PactRow({
       </span>
 
       <span className="font-mono text-xs text-[#8e969f]">
-        {shortenAddress(counterparty)}
+        {shortenAddress(
+          counterparty
+        )}
       </span>
 
       <span className="text-sm text-white">
@@ -166,13 +234,26 @@ function PactRow({
       </span>
 
       <div>
-        <StatusBadge status={status} />
+        <StatusBadge
+          status={
+            status
+          }
+        />
       </div>
     </Link>
   );
 }
 
 export default function Dashboard() {
+  const [
+    mounted,
+    setMounted,
+  ] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const {
     address,
     isConnected,
@@ -180,84 +261,184 @@ export default function Dashboard() {
 
   const {
     data: pactCount,
-    isLoading: isPactCountLoading,
+    isLoading:
+    isPactCountLoading,
   } = useReadContract({
-    address: PACT_FACTORY_ADDRESS,
-    abi: pactFactoryAbi,
-    functionName: "getPactCount",
+    address:
+      PACT_FACTORY_ADDRESS,
+
+    abi:
+      pactFactoryAbi,
+
+    functionName:
+      "getPactCount",
   });
 
   const {
     data: clientPacts,
-    isLoading: clientPactsLoading,
+    isLoading:
+    clientPactsLoading,
   } = useReadContract({
-    address: PACT_FACTORY_ADDRESS,
-    abi: pactFactoryAbi,
-    functionName: "getClientPacts",
-    args: address ? [address] : undefined,
+    address:
+      PACT_FACTORY_ADDRESS,
+
+    abi:
+      pactFactoryAbi,
+
+    functionName:
+      "getClientPacts",
+
+    args:
+      address
+        ? [
+          address,
+        ]
+        : undefined,
+
     query: {
-      enabled: !!address,
+      enabled:
+        !!address,
     },
   });
 
   const {
     data: freelancerPacts,
-    isLoading: freelancerPactsLoading,
+    isLoading:
+    freelancerPactsLoading,
   } = useReadContract({
-    address: PACT_FACTORY_ADDRESS,
-    abi: pactFactoryAbi,
-    functionName: "getFreelancerPacts",
-    args: address ? [address] : undefined,
+    address:
+      PACT_FACTORY_ADDRESS,
+
+    abi:
+      pactFactoryAbi,
+
+    functionName:
+      "getFreelancerPacts",
+
+    args:
+      address
+        ? [
+          address,
+        ]
+        : undefined,
+
     query: {
-      enabled: !!address,
+      enabled:
+        !!address,
     },
   });
 
   const combinedPacts = [
-    ...(clientPacts ?? []),
-    ...(freelancerPacts ?? []),
+    ...(clientPacts ??
+      []),
+
+    ...(freelancerPacts ??
+      []),
   ];
 
-  const uniquePacts = Array.from(
-    new Set(
-      combinedPacts.map((pact) =>
-        pact.toLowerCase()
+  const uniquePacts =
+    Array.from(
+      new Set(
+        combinedPacts.map(
+          (pact) =>
+            pact.toLowerCase()
+        )
       )
-    )
-  ).map((lowercaseAddress) => {
-    return combinedPacts.find(
-      (pact) =>
-        pact.toLowerCase() === lowercaseAddress
-    ) as Address;
-  });
+    ).map(
+      (
+        lowercaseAddress
+      ) => {
+        return combinedPacts.find(
+          (pact) =>
+            pact.toLowerCase() ===
+            lowercaseAddress
+        ) as Address;
+      }
+    );
 
   const realStats = [
     {
-      label: "Total Pacts",
-      value: isPactCountLoading
-        ? "..."
-        : pactCount?.toString() ?? "0",
-      detail: "Created through PactFactory",
+      label:
+        "Total Pacts",
+
+      value:
+        isPactCountLoading
+          ? "..."
+          : pactCount?.toString() ??
+          "0",
+
+      detail:
+        "Created through PactFactory",
     },
+
     {
-      label: "As Client",
-      value: clientPactsLoading
-        ? "..."
-        : clientPacts?.length.toString() ?? "0",
-      detail: isConnected
-        ? "Pacts created by this wallet"
-        : "Connect wallet to view",
+      label:
+        "As Client",
+
+      value:
+        clientPactsLoading
+          ? "..."
+          : clientPacts?.length.toString() ??
+          "0",
+
+      detail:
+        isConnected
+          ? "Pacts created by this wallet"
+          : "Connect wallet to view",
     },
+
     {
-      label: "As Freelancer",
-      value: freelancerPactsLoading
-        ? "..."
-        : freelancerPacts?.length.toString() ?? "0",
-      detail: isConnected
-        ? "Pacts assigned to this wallet"
-        : "Connect wallet to view",
+      label:
+        "As Freelancer",
+
+      value:
+        freelancerPactsLoading
+          ? "..."
+          : freelancerPacts?.length.toString() ??
+          "0",
+
+      detail:
+        isConnected
+          ? "Pacts assigned to this wallet"
+          : "Connect wallet to view",
     },
   ];
+
+  if (!mounted) {
+    return (
+      <main className="px-8 py-10">
+        <div className="mx-auto max-w-[1180px]">
+          <div className="mb-10">
+            <h1 className="text-[32px] font-semibold tracking-[-0.03em] text-white">
+              Overview
+            </h1>
+
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#8e969f]">
+              Loading dashboard...
+            </p>
+          </div>
+
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {Array.from({
+              length: 3,
+            }).map(
+              (
+                _,
+                index
+              ) => (
+                <div
+                  key={
+                    index
+                  }
+                  className="h-[156px] animate-pulse rounded-xl border border-[#24282d] bg-[#111418]"
+                />
+              )
+            )}
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="px-8 py-10">
@@ -269,9 +450,8 @@ export default function Dashboard() {
             </h1>
 
             <p className="mt-2 max-w-xl text-sm leading-6 text-[#8e969f]">
-              Manage milestone-based agreements,
-              escrow balances, submissions, and payment
-              releases.
+              Manage milestone-based agreements, escrow balances,
+              submissions, and payment releases.
             </p>
           </div>
 
@@ -284,26 +464,36 @@ export default function Dashboard() {
         </div>
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {realStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-[#24282d] bg-[#111418] p-5"
-            >
-              <p className="text-sm text-[#8e969f]">
-                {stat.label}
-              </p>
+          {realStats.map(
+            (stat) => (
+              <div
+                key={
+                  stat.label
+                }
+                className="rounded-xl border border-[#24282d] bg-[#111418] p-5"
+              >
+                <p className="text-sm text-[#8e969f]">
+                  {
+                    stat.label
+                  }
+                </p>
 
-              <div className="mt-5">
-                <p className="text-[30px] font-semibold tracking-[-0.03em] text-white">
-                  {stat.value}
+                <div className="mt-5">
+                  <p className="text-[30px] font-semibold tracking-[-0.03em] text-white">
+                    {
+                      stat.value
+                    }
+                  </p>
+                </div>
+
+                <p className="mt-2 text-xs text-[#636b74]">
+                  {
+                    stat.detail
+                  }
                 </p>
               </div>
-
-              <p className="mt-2 text-xs text-[#636b74]">
-                {stat.detail}
-              </p>
-            </div>
-          ))}
+            )
+          )}
         </section>
 
         <section className="mt-8">
@@ -319,7 +509,10 @@ export default function Dashboard() {
             </div>
 
             <span className="text-sm text-[#636b74]">
-              {uniquePacts.length} agreements
+              {
+                uniquePacts.length
+              }{" "}
+              agreements
             </span>
           </div>
 
@@ -330,8 +523,7 @@ export default function Dashboard() {
               </p>
 
               <p className="mt-2 text-sm text-[#636b74]">
-                Your client and freelancer agreements will
-                appear here.
+                Your client and freelancer agreements will appear here.
               </p>
             </div>
           ) : clientPactsLoading ||
@@ -341,7 +533,8 @@ export default function Dashboard() {
                 Loading agreements...
               </p>
             </div>
-          ) : uniquePacts.length === 0 ? (
+          ) : uniquePacts.length ===
+            0 ? (
             <div className="rounded-xl border border-[#24282d] bg-[#111418] px-6 py-12 text-center">
               <p className="text-sm font-medium text-white">
                 No Pacts yet
@@ -361,21 +554,45 @@ export default function Dashboard() {
           ) : (
             <div className="overflow-hidden rounded-xl border border-[#24282d] bg-[#111418]">
               <div className="grid grid-cols-[2fr_0.8fr_1fr_0.8fr_0.8fr] border-b border-[#24282d] px-5 py-3 text-xs text-[#636b74]">
-                <span>Project</span>
-                <span>Role</span>
-                <span>Counterparty</span>
-                <span>Amount</span>
-                <span>Status</span>
+                <span>
+                  Project
+                </span>
+
+                <span>
+                  Role
+                </span>
+
+                <span>
+                  Counterparty
+                </span>
+
+                <span>
+                  Amount
+                </span>
+
+                <span>
+                  Status
+                </span>
               </div>
 
               <div className="divide-y divide-[#24282d]">
-                {uniquePacts.map((pactAddress) => (
-                  <PactRow
-                    key={pactAddress}
-                    pactAddress={pactAddress}
-                    connectedAddress={address}
-                  />
-                ))}
+                {uniquePacts.map(
+                  (
+                    pactAddress
+                  ) => (
+                    <PactRow
+                      key={
+                        pactAddress
+                      }
+                      pactAddress={
+                        pactAddress
+                      }
+                      connectedAddress={
+                        address
+                      }
+                    />
+                  )
+                )}
               </div>
             </div>
           )}
@@ -388,14 +605,12 @@ export default function Dashboard() {
             </p>
 
             <h3 className="mt-4 max-w-sm text-lg font-medium leading-7 text-white">
-              Funds stay locked until approved work is
-              ready for payment.
+              Funds stay locked until approved work is ready for payment.
             </h3>
 
             <p className="mt-3 max-w-lg text-sm leading-6 text-[#8e969f]">
-              AI assists with milestone review. The client
-              keeps final control over approval and payment
-              release.
+              AI assists with milestone review. The client keeps final
+              control over approval and payment release.
             </p>
           </div>
 

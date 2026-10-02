@@ -14,6 +14,7 @@ import FundEscrowPanel from "@/components/pact/FundEscrowPanel";
 import MilestonePanel from "@/components/pact/MilestonePanel";
 import TransactionStatus from "@/components/pact/TransactionStatus";
 import DemoFaucetPanel from "@/components/pact/DemoFaucetPanel";
+import Link from "next/link";
 
 import {
     pactStatusLabel,
@@ -349,6 +350,13 @@ export default function PactDetailPage({
     return (
         <main className="px-8 py-10">
             <div className="mx-auto max-w-[1180px]">
+                <Link
+                    href="/"
+                    className="mb-6 inline-flex items-center gap-2 text-sm text-[#8e969f] transition hover:text-white"
+                >
+                    <span>←</span>
+                    Back to Dashboard
+                </Link>
                 <PactHeader
                     pactAddress={
                         pactAddress

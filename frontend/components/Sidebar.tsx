@@ -1,59 +1,83 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const navigation = [
   {
-    name: "Overview",
-    active: true,
+    label: "Overview",
+    href: "/",
   },
   {
-    name: "Create Pact",
-    active: false,
+    label: "Create Pact",
+    href: "/create",
   },
   {
-    name: "My Pacts",
-    active: false,
+    label: "My Pacts",
+    href: "/pacts",
   },
   {
-    name: "Activity",
-    active: false,
+    label: "Activity",
+    href: "/activity",
   },
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname.startsWith(href);
+  }
+
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-[240px] flex-col border-r border-[#24282d] bg-[#0b0d0f] px-5 py-6">
-      <div className="mb-10 flex items-center gap-3 px-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#c7ff1a] text-sm font-bold text-black">
+      <Link
+        href="/"
+        className="flex items-center gap-3"
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#c7ff1a] font-bold text-black">
           P
         </div>
 
         <div>
-          <p className="text-[17px] font-semibold tracking-tight text-white">
+          <p className="font-semibold text-white">
             Pactra
           </p>
-          <p className="text-xs text-[#636b74]">Escrow Protocol</p>
+
+          <p className="text-xs text-[#636b74]">
+            Escrow Protocol
+          </p>
         </div>
-      </div>
+      </Link>
 
-      <nav className="space-y-1">
-        {navigation.map((item) => (
-          <button
-            key={item.name}
-            className={`flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm transition ${
-              item.active
-                ? "bg-[#161a1f] font-medium text-white"
-                : "text-[#8e969f] hover:bg-[#111418] hover:text-white"
-            }`}
-          >
-            <span
-              className={`mr-3 h-1.5 w-1.5 rounded-full ${
-                item.active ? "bg-[#c7ff1a]" : "bg-[#3b4148]"
-              }`}
-            />
+      <nav className="mt-10 space-y-1">
+        {navigation.map((item) => {
+          const active = isActive(item.href);
 
-            {item.name}
-          </button>
-        ))}
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition ${active
+                  ? "bg-[#161a1f] text-white"
+                  : "text-[#8e969f] hover:bg-[#111418] hover:text-white"
+                }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${active
+                    ? "bg-[#c7ff1a]"
+                    : "bg-[#3a4047]"
+                  }`}
+              />
+
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mt-auto border-t border-[#24282d] pt-5">
@@ -63,10 +87,11 @@ export default function Sidebar() {
           </p>
 
           <div className="mt-2 flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[#43d17b]" />
-            <span className="text-xs text-[#8e969f]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#43d17b]" />
+
+            <p className="text-xs text-[#636b74]">
               Testnet connected
-            </span>
+            </p>
           </div>
         </div>
       </div>
