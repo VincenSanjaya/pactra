@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const navigation = [
   {
     label: "Overview",
-    href: "/",
+    href: "/dashboard",
   },
   {
     label: "Create Pact",

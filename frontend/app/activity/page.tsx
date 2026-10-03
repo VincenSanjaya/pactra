@@ -103,7 +103,7 @@ export default function ActivityPage() {
         <main className="px-8 py-10">
             <div className="mx-auto max-w-[1180px]">
                 <Link
-                    href="/"
+                    href="/dashboard"
                     className="mb-6 inline-flex items-center gap-2 text-sm text-[#8e969f] transition hover:text-white"
                 >
                     <span>←</span>
